@@ -53,3 +53,10 @@ services:
       - jmx_exporter
     volumes:
       - ./prometheus_config.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus
