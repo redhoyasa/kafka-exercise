@@ -27,3 +27,8 @@ docker-compose exec kafka /usr/bin/kafka-console-consumer \
     --topic dummy.topic \
     --from-beginning
 ```
+
+## Access
+
+ - Prometheus: [localhost:8080](http://localhost:8080/)
+ - Grafana: [localhost:3000](http://localhost:3000/)
