@@ -33,7 +33,7 @@ services:
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
       SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
 
   jmx_exporter:
     image: sscaling/jmx-prometheus-exporter:latest
@@ -42,7 +42,7 @@ services:
     links:
       - kafka
     volumes:
-      - ./jmx_exporter_config.yml:/opt/jmx_exporter/config.yml
+      - ./config/jmx_exporter_config.yml:/opt/jmx_exporter/config.yml
 
   prometheus:
     image: prom/prometheus:latest
@@ -52,7 +52,7 @@ services:
       - kafka
       - jmx_exporter
     volumes:
-      - ./prometheus_config.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus_config.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana:latest
@@ -60,3 +60,32 @@ services:
       - "3000:3000"
     links:
       - prometheus
+
+  mysql:
+    image: debezium/example-mysql:0.8
+    ports:
+     - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: debezium
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mysqlpw
+
+  connect:
+    image: debezium/connect:0.8
+    ports:
+      - 8083:8083
+    links:
+      - kafka
+      - mysql
+      - schema-registry
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081

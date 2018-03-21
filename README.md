@@ -28,7 +28,12 @@ docker-compose exec kafka /usr/bin/kafka-console-consumer \
     --from-beginning
 ```
 
+Add connector to Kafka Connect:
+```sh
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @./config/register-mysql.json
+```
+
 ## Access
 
- - Prometheus: [localhost:8080](http://localhost:8080/)
+ - Prometheus: [localhost:9090](http://localhost:9090/)
  - Grafana: [localhost:3000](http://localhost:3000/)
