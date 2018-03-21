@@ -2,6 +2,8 @@
 
 Learning Kafka by playing. This repo currently follows the [tutorial](https://docs.confluent.io/current/installation/docker/docs/index.html) by Confluent.
 
+This repo also uses Kafka Connect from [Debezium](https://github.com/debezium/docker-images) for simulating Kafka Connect.
+
 ## Usage
 
 Run Kafka and its dependencies:

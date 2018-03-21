@@ -62,13 +62,16 @@ services:
       - prometheus
 
   mysql:
-    image: debezium/example-mysql:0.8
+    image: mysql:5.5
     ports:
      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: debezium
       MYSQL_USER: mysqluser
       MYSQL_PASSWORD: mysqlpw
+    volumes:
+      - ./config/mysql.cnf:/etc/mysql/my.cnf
+      - ./config/inventory.sql:/docker-entrypoint-initdb.d/inventory.sql
 
   connect:
     image: debezium/connect:0.8
