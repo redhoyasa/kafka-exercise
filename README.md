@@ -11,6 +11,11 @@ Run Kafka and its dependencies:
 docker-compose up
 ```
 
+List existing topics:
+```sh
+docker-compose exec kafka /usr/bin/kafka-topics --list --zookeeper zookeeper:2181
+```
+
 Simulate message producer:
 ```sh
 # you may change the value of parameters if needed.
