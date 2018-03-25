@@ -2,8 +2,6 @@
 
 Learning Kafka by playing. This repo currently follows the [tutorial](https://docs.confluent.io/current/installation/docker/docs/index.html) by Confluent.
 
-This repo also uses Kafka Connect from [Debezium](https://github.com/debezium/docker-images) for simulating Kafka Connect.
-
 ## Usage
 
 Run Kafka and its dependencies:
@@ -35,12 +33,22 @@ docker-compose exec kafka /usr/bin/kafka-console-consumer \
     --from-beginning
 ```
 
+
+## Monitoring
+
+Since Kafka's JMX port has been exposed, you can monitor Kafka metrics through the JMX metrics. 
+
+This repo uses Prometheus + Grafana for monitoring Kafka metrics by exporting JMX metrics via Prometheus' JMX Exporter plugin.
+
+ - Prometheus will be available in  [localhost:9090](http://localhost:9090/)
+ - Grafana will be available in [localhost:3000](http://localhost:3000/)
+
+
+## Kafka Connect
+
+This repo uses Kafka Connect from [Debezium](https://github.com/debezium/docker-images) for simulating [Kafka Connect](https://docs.confluent.io/current/connect/index.html).
+
 Add connector to Kafka Connect:
 ```sh
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @./config/register-mysql.json
 ```
-
-## Access
-
- - Prometheus: [localhost:9090](http://localhost:9090/)
- - Grafana: [localhost:3000](http://localhost:3000/)
