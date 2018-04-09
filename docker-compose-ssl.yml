@@ -18,11 +18,19 @@ services:
       - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_ADVERTISED_LISTENERS: "SSL://kafka:9092"
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9010
       KAFKA_JMX_HOSTNAME: kafka
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: broker_keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: broker_sslkey_creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.broker.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: broker_truststore_creds
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
+    volumes:
+      - ./secrets:/etc/kafka/secrets
 
   schema-registry:
     image: confluentinc/cp-schema-registry:latest
@@ -31,9 +39,17 @@ services:
     links:
       - kafka
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SSL://kafka:9092"
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: "SSL"
       SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
       SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: "/etc/kafka/secrets/kafka.consumer.keystore.jks"
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD: "test1234"
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEY_PASSWORD: "test1234"
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/kafka.consumer.truststore.jks"
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: "test1234"
+    volumes:
+      - ./secrets:/etc/kafka/secrets
 
   jmx_exporter:
     image: sscaling/jmx-prometheus-exporter:latest
@@ -51,7 +67,6 @@ services:
     links:
       - kafka
       - jmx_exporter
-      - cadvisor
     volumes:
       - ./config/prometheus_config.yml:/etc/prometheus/prometheus.yml
 
@@ -80,7 +95,7 @@ services:
       - mysql
       - schema-registry
     environment:
-      BOOTSTRAP_SERVERS: kafka:9092
+      BOOTSTRAP_SERVERS: "SSL://kafka:9092"
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
@@ -90,31 +105,12 @@ services:
       INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-
-  kafka-connect-ui:
-    image: landoop/kafka-connect-ui
-    ports:
-      - 8000:8000
-    links:
-      - connect
-    environment:
-      CONNECT_URL: http://connect:8083
-
-  cadvisor:
-    image: google/cadvisor:latest
-    ports:
-      - 8080:8080
+      CONNECT_SSL_KEYSTORE_LOCATION: "/etc/kafka/secrets/kafka.producer.keystore.jks"
+      CONNECT_SSL_KEYSTORE_PASSWORD: "test1234"
+      CONNECT_SSL_KEY_PASSWORD: "test1234"
+      CONNECT_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/kafka.producer.truststore.jks"
+      CONNECT_SSL_TRUSTSTORE_PASSWORD: "test1234"
+      CONNECT_SECURITY_PROTOCOL: "SSL"
+      HEAP_OPTS: -Xmx2G -Xms2G
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-
-  nodeexporter:
-    image: prom/node-exporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    ports:
-      - 9100:9100
+      - ./secrets:/etc/kafka/secrets

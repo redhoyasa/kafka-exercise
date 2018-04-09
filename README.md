@@ -33,6 +33,14 @@ docker-compose exec kafka /usr/bin/kafka-console-consumer \
     --from-beginning
 ```
 
+Reset offset:
+```sh
+docker-compose exec kafka /usr/bin/kafka-consumer-groups \
+    --bootstrap-server kafka:9092 --group mygroup \
+    --reset-offsets --to-earliest \
+    --all-topics --execute
+```
+
 
 ## Monitoring
 

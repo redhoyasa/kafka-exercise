@@ -1,0 +1,28 @@
+{
+    "name": "inventory-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+        "tasks.max": "1",
+        "database.hostname": "mysql",
+        "database.port": "3306",
+        "database.user": "debezium",
+        "database.password": "dbz",
+        "database.server.id": "184054",
+        "database.server.name": "dbserver1",
+        "database.whitelist": "inventory",
+        "database.history.kafka.bootstrap.servers": "kafka:9092",
+        "database.history.kafka.topic": "schema-changes.inventory",
+        "database.history.producer.security.protocol": "SSL",
+        "database.history.producer.ssl.keystore.location": "/etc/kafka/secrets/kafka.producer.keystore.jks",
+        "database.history.producer.ssl.keystore.password": "test1234",
+        "database.history.producer.ssl.truststore.location": "/etc/kafka/secrets/kafka.producer.truststore.jks",
+        "database.history.producer.ssl.truststore.password": "test1234",
+        "database.history.producer.ssl.key.password": "test1234",
+        "database.history.consumer.security.protocol": "SSL",
+        "database.history.consumer.ssl.keystore.location": "/etc/kafka/secrets/kafka.consumer.keystore.jks",
+        "database.history.consumer.ssl.keystore.password": "test1234",
+        "database.history.consumer.ssl.truststore.location": "/etc/kafka/secrets/kafka.consumer.truststore.jks",
+        "database.history.consumer.ssl.truststore.password": "test1234",
+        "database.history.consumer.ssl.key.password": "test1234"
+    }
+}
